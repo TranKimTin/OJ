@@ -245,6 +245,39 @@ bash ~/oj-data/start-dev.sh
 
 Script này khởi động web + bridge + celery + judge cùng lúc (xem nội dung trong file).
 
+## 13. Piston — nút "Chạy thử sample" trên trang đề (tùy chọn)
+
+Tính năng chạy thử sample/custom input cần container Piston (cần Docker):
+
+```bash
+# Cài Docker nếu chưa có
+curl -fsSL https://get.docker.com | sudo sh && sudo usermod -aG docker $USER
+
+# Chạy Piston (bind localhost, KHÔNG mở ra mạng ngoài)
+sudo docker run -d --name piston --restart unless-stopped --privileged \
+    -p 127.0.0.1:2000:2000 \
+    -v $HOME/piston/packages:/piston/packages \
+    -e PISTON_OUTPUT_MAX_SIZE=1048576 \
+    ghcr.io/engineer-man/piston
+
+# Cài runtime (tải toolchain, hơi lâu)
+for pkg in '{"language":"gcc","version":"10.2.0"}' '{"language":"python","version":"3.12.0"}' \
+           '{"language":"python","version":"2.7.18"}' '{"language":"java","version":"15.0.2"}' \
+           '{"language":"kotlin","version":"1.8.20"}' '{"language":"pascal","version":"3.2.2"}'; do
+  curl -X POST http://localhost:2000/api/v2/packages -H 'Content-Type: application/json' -d "$pkg"
+done
+```
+
+Thêm vào `dmoj/local_settings.py` rồi khởi động lại web:
+
+```python
+VNOJ_PISTON_URL = 'http://localhost:2000'
+```
+
+Cuối cùng, vào trang sửa test data của bài (`/problem/<mã>/test_data`) tick ô
+**Sample?** cho các test muốn cho chạy thử. Không đặt `VNOJ_PISTON_URL` thì
+tính năng tự ẩn. Thiết kế chi tiết: `dev-plans/run-sample-tests.md`.
+
 ## Xử lý lỗi đã gặp
 
 | Lỗi | Nguyên nhân / cách sửa |
