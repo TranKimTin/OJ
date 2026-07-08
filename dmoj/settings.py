@@ -161,7 +161,7 @@ VNOJ_PISTON_TOTAL_BUDGET = 25.0          # must stay below the production worker
 VNOJ_PISTON_REQUEST_TIMEOUT = 20.0       # HTTP timeout per Piston call
 VNOJ_PISTON_RUNTIMES_CACHE_TTL = 300
 VNOJ_PISTON_RATE_LIMIT_WINDOW = 60
-VNOJ_PISTON_RATE_LIMIT_COUNT = 6
+VNOJ_PISTON_RATE_LIMIT_COUNT = 100
 
 VNOJ_TAG_PROBLEM_MIN_RATING = 1900  # Minimum rating to be able to tag a problem
 

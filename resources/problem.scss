@@ -511,6 +511,17 @@ ul.problem-list {
     border: 1px solid $color_problem_tab_border;
 }
 
+#run-custom-toggle {
+    margin-right: 8px;
+    cursor: pointer;
+    user-select: none;
+
+    input[type=checkbox] {
+        vertical-align: middle;
+        cursor: pointer;
+    }
+}
+
 #custom-input-area {
     margin-top: 10px;
 

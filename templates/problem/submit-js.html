@@ -252,7 +252,7 @@
     {% if piston_enabled %}
     <script type="text/javascript">
         $(function () {
-            var piston_langs = {{ piston_langs }};
+            var piston_langs = {{ piston_langs|safe }};
             var run_url = '{{ run_url }}';
             var $results = $('#test-run-results');
             var TRUNCATED_SUFFIX = ' ' + {{ _('(truncated)')|htmltojs }};
@@ -265,16 +265,18 @@
 
             function update_run_buttons() {
                 var ok = runner_supported();
-                $('#run-samples, #run-custom-toggle, #run-custom').prop('disabled', !ok)
+                $('#run-tests').prop('disabled', !ok)
                     .attr('title', ok ? '' : {{ _('This language is not supported by the test runner.')|htmltojs }});
+                var $check = $('#run-custom-check');
+                $check.prop('disabled', !ok || !!$check.data('force'));
             }
 
             $('#id_language').change(update_run_buttons);
             update_run_buttons();
 
-            $('#run-custom-toggle').click(function () {
-                $('#custom-input-area').toggleClass('hidden');
-                if (!$('#custom-input-area').hasClass('hidden'))
+            $('#run-custom-check').change(function () {
+                $('#custom-input-area').toggleClass('hidden', !this.checked);
+                if (this.checked)
                     $('#custom-input').focus();
             });
 
@@ -321,7 +323,7 @@
                     alert({{ _('Your source code must contain at most 65536 characters.')|htmltojs }});
                     return;
                 }
-                $('#run-samples, #run-custom').prop('disabled', true);
+                $('#run-tests').prop('disabled', true);
                 $results.removeClass('hidden').empty()
                     .append($('<i class="fa fa-spinner fa-pulse">'))
                     .append($('<span>').text(' ' + {{ _('Running...')|htmltojs }}));
@@ -356,8 +358,9 @@
                 });
             }
 
-            $('#run-samples').click(function () { run_tests('samples'); });
-            $('#run-custom').click(function () { run_tests('custom'); });
+            $('#run-tests').click(function () {
+                run_tests($('#run-custom-check').is(':checked') ? 'custom' : 'samples');
+            });
         });
     </script>
     {% endif %}

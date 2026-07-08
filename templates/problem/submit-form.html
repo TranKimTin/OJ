@@ -75,13 +75,13 @@
         <div class="submit-bar">
             {{ form.judge }}
             {% if piston_enabled %}
-                {% if has_sample_cases %}
-                    <button type="button" id="run-samples" class="button">
-                        <i class="fa fa-play"></i> {{ _('Run sample tests') }}
-                    </button>
-                {% endif %}
-                <button type="button" id="run-custom-toggle" class="button">
-                    <i class="fa fa-terminal"></i> {{ _('Run with custom input') }}
+                <label id="run-custom-toggle">
+                    <input type="checkbox" id="run-custom-check"
+                           {% if not has_sample_cases %}checked disabled data-force="1"{% endif %}>
+                    {{ _('Run with custom input') }}
+                </label>
+                <button type="button" id="run-tests" class="button">
+                    <i class="fa fa-play"></i> {{ _('Run') }}
                 </button>
             {% endif %}
             <input type="submit" value="{{ _('Submit!') }}" class="button"
@@ -90,12 +90,9 @@
     {% endif %}
 </form>
 {% if piston_enabled and not no_judges %}
-    <div id="custom-input-area" class="hidden">
+    <div id="custom-input-area" class="{{ 'hidden' if has_sample_cases }}">
         <label for="custom-input"><i>{{ _('Your program will read from this input:') }}</i></label>
         <textarea id="custom-input" rows="5"></textarea>
-        <button type="button" id="run-custom" class="button">
-            <i class="fa fa-play"></i> {{ _('Run') }}
-        </button>
     </div>
     <div id="test-run-results" class="hidden"></div>
 {% endif %}

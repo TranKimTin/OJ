@@ -36,6 +36,7 @@ backup*.json
 custom_script_*
 websocket/config.js
 node_modules/
+venv/
 db.json
 tmp.sh
 *.sql
