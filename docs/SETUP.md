@@ -21,6 +21,19 @@ từ fork repo đến chấm được bài đầu tiên. Làm theo từ trên xu
 - **Judge**: repo `TranKimTin/judge-server` (fork của `VNOI-Admin/judge-server`) — máy chấm, kết nối vào site qua bridge (port 9999).
 - Hai repo clone **cạnh nhau**, không lồng vào nhau.
 
+### Vai trò 3 repo — sửa code thì sửa ở đâu?
+
+| Repo | Vai trò | Tần suất đụng vào |
+|---|---|---|
+| **OJ** (site) | Mọi thứ người dùng thấy và mọi tính năng: giao diện, trang đề, contest, rating, tài khoản, cả tính năng tự viết (như nút "Chạy thử sample"). | **95% thời gian** — dev hằng ngày là ở đây |
+| **judge-server** | Engine thực thi và chấm code. Fork chủ yếu để **khóa phiên bản** khớp với site, không phải để sửa. | Hiếm khi: thêm compiler mới, grader đặc biệt; định kỳ merge upstream để nhận vá bảo mật sandbox |
+| **vnoj-docker** (chưa fork, để đến lúc deploy) | Không phải code — chỉ là config deploy: docker-compose, nginx, template env. | Lần đầu lên VPS + khi hạ tầng đổi (thêm service, đổi port); xong để yên hàng tháng |
+
+Hình dung: OJ là **ngôi nhà** liên tục trang trí sửa sang, judge-server là
+**hệ thống điện nước** chỉ gọi thợ khi hỏng, vnoj-docker là **bản vẽ móng**
+chỉ dùng khi xây nhà mới. Máy dev hằng ngày chỉ cần theo dõi repo OJ;
+judge-server clone một lần để chạy; vnoj-docker đến giai đoạn deploy hẵng quan tâm.
+
 ## 1. Fork repo (làm 1 lần duy nhất)
 
 Fork 2 repo về tài khoản GitHub của bạn (nút Fork trên web, hoặc API):
