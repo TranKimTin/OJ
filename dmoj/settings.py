@@ -133,6 +133,36 @@ VNOJ_COMMENT_RATE_LIMIT_WINDOW = datetime.timedelta(seconds=600)
 
 VNOJ_TESTCASE_VISIBLE_LENGTH = 60
 
+# In-browser test runner (Piston). Set VNOJ_PISTON_URL (e.g. 'http://localhost:2000')
+# in local_settings.py to enable; None disables the feature entirely (no UI, endpoint 404s).
+VNOJ_PISTON_URL = None
+VNOJ_PISTON_LANGUAGE_MAP = {
+    'C': {'language': 'c', 'version': '*'},
+    'C11': {'language': 'c', 'version': '*'},
+    'CPP03': {'language': 'c++', 'version': '*'},
+    'CPP11': {'language': 'c++', 'version': '*'},
+    'CPP14': {'language': 'c++', 'version': '*'},
+    'CPP17': {'language': 'c++', 'version': '*'},
+    'CPP20': {'language': 'c++', 'version': '*'},
+    'JAVA': {'language': 'java', 'version': '*'},
+    'KOTLIN': {'language': 'kotlin', 'version': '*'},
+    'PAS': {'language': 'pascal', 'version': '*'},
+    'PY2': {'language': 'python2', 'version': '*'},
+    'PY3': {'language': 'python', 'version': '3'},
+}
+VNOJ_PISTON_MAX_SAMPLES = 5              # cases per run
+VNOJ_PISTON_MAX_SOURCE_LENGTH = 65536    # matches the client-side cap in submit-js.html
+VNOJ_PISTON_MAX_CUSTOM_INPUT = 65536     # bytes of pasted stdin
+VNOJ_PISTON_MAX_TESTCASE_SIZE = 1048576  # skip sample files larger than this
+VNOJ_PISTON_MAX_DISPLAY = 4096           # chars of each stream echoed to the browser
+VNOJ_PISTON_COMPILE_TIMEOUT = 10.0       # seconds
+VNOJ_PISTON_RUN_TIMEOUT_CAP = 3.0        # per-case cap; effective = min(problem.time_limit, cap)
+VNOJ_PISTON_TOTAL_BUDGET = 25.0          # must stay below the production worker timeout
+VNOJ_PISTON_REQUEST_TIMEOUT = 20.0       # HTTP timeout per Piston call
+VNOJ_PISTON_RUNTIMES_CACHE_TTL = 300
+VNOJ_PISTON_RATE_LIMIT_WINDOW = 60
+VNOJ_PISTON_RATE_LIMIT_COUNT = 6
+
 VNOJ_TAG_PROBLEM_MIN_RATING = 1900  # Minimum rating to be able to tag a problem
 
 VNOJ_SHOULD_BAN_FOR_CHEATING_IN_CONTESTS = False

@@ -17,6 +17,7 @@ Càng ở tầng trên càng dễ làm và càng ít gây conflict khi merge cod
 | Đăng nhập Facebook | `SOCIAL_AUTH_FACEBOOK_KEY` / `..._SECRET` |
 | Đăng nhập GitHub | `SOCIAL_AUTH_GITHUB_SECURE_KEY` / `..._SECRET` |
 | Gửi email (kích hoạt tài khoản, quên mật khẩu) | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS = True`, `DEFAULT_FROM_EMAIL` (Gmail thì dùng App Password) |
+| Nút "Chạy thử sample" trên trang đề (tính năng tự viết) | `VNOJ_PISTON_URL = 'http://localhost:2000'` — cần container Piston chạy kèm ([DEPLOY.md](DEPLOY.md) mục 6b); các limit chỉnh qua `VNOJ_PISTON_*` (xem `dmoj/settings.py`); setter tick ô "Sample?" trong trang sửa test data để chọn test cho chạy thử |
 
 Sửa xong khởi động lại `runserver` là ăn.
 

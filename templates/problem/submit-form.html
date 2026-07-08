@@ -57,6 +57,7 @@
                             <option value="{{ lang.id }}" data-id="{{ lang.id }}" data-name="{{ lang.name }}"
                                     data-info="{{ lang.info }}" data-ace="{{ lang.ace }}" data-fileonly="{{ lang.file_only }}"
                                     data-ext="{{ lang.extension }}" data-file-size="{{ lang.file_size_limit }}"
+                                    data-key="{{ lang.key }}"
                                     data-judge-info="{{ runtime_versions(lang.runtime_versions()) }}"
                                     {% if lang.id == default_lang.id %}selected{% endif %}>{{ lang.name }}</option>
                         {% endfor %}
@@ -73,8 +74,28 @@
     {% else %}
         <div class="submit-bar">
             {{ form.judge }}
+            {% if piston_enabled %}
+                {% if has_sample_cases %}
+                    <button type="button" id="run-samples" class="button">
+                        <i class="fa fa-play"></i> {{ _('Run sample tests') }}
+                    </button>
+                {% endif %}
+                <button type="button" id="run-custom-toggle" class="button">
+                    <i class="fa fa-terminal"></i> {{ _('Run with custom input') }}
+                </button>
+            {% endif %}
             <input type="submit" value="{{ _('Submit!') }}" class="button"
                    {% if request.in_contest and submission_limit and not submissions_left %}disabled{% endif %}>
         </div>
     {% endif %}
 </form>
+{% if piston_enabled and not no_judges %}
+    <div id="custom-input-area" class="hidden">
+        <label for="custom-input"><i>{{ _('Your program will read from this input:') }}</i></label>
+        <textarea id="custom-input" rows="5"></textarea>
+        <button type="button" id="run-custom" class="button">
+            <i class="fa fa-play"></i> {{ _('Run') }}
+        </button>
+    </div>
+    <div id="test-run-results" class="hidden"></div>
+{% endif %}

@@ -1,9 +1,11 @@
 # Plan: Tính năng "Chạy thử sample test + custom input" trên trang đề
 
-> **Trạng thái: CHƯA IMPLEMENT — file này là kế hoạch chi tiết, viết để một
-> session làm việc mới đọc từ số 0 là bắt tay code được.**
-> Cách dùng: đọc từ đầu, thực hiện theo mục "Thứ tự implement" (mục 9),
-> nghiệm thu bằng "Checklist verify" (mục 10), đọc "Rủi ro" (mục 11) trước khi code.
+> **Trạng thái: ĐÃ IMPLEMENT (08/07/2026).** File này giữ lại làm tài liệu thiết kế.
+> Khác biệt so với plan khi làm thật: (1) map `PY2` dùng runtime `python2` của Piston
+> (package cài dưới tên `python` 2.7.18 nhưng đăng ký runtime là `python2`);
+> (2) Piston bind `127.0.0.1:2000` thay vì mở mọi interface; (3) endpoint chỉ nhận
+> POST qua `http_method_names` để tránh 500 khi GET; (4) `run_url` đưa vào context
+> từ server thay vì build trong template.
 
 ---
 

@@ -249,4 +249,116 @@
             location.reload(true);
         }
     </script>
+    {% if piston_enabled %}
+    <script type="text/javascript">
+        $(function () {
+            var piston_langs = {{ piston_langs }};
+            var run_url = '{{ run_url }}';
+            var $results = $('#test-run-results');
+            var TRUNCATED_SUFFIX = ' ' + {{ _('(truncated)')|htmltojs }};
+
+            function runner_supported() {
+                var opt = $('#id_language').find('option:selected');
+                return piston_langs.indexOf(opt.attr('data-key')) !== -1 &&
+                    opt.attr('data-fileonly') !== 'True';
+            }
+
+            function update_run_buttons() {
+                var ok = runner_supported();
+                $('#run-samples, #run-custom-toggle, #run-custom').prop('disabled', !ok)
+                    .attr('title', ok ? '' : {{ _('This language is not supported by the test runner.')|htmltojs }});
+            }
+
+            $('#id_language').change(update_run_buttons);
+            update_run_buttons();
+
+            $('#run-custom-toggle').click(function () {
+                $('#custom-input-area').toggleClass('hidden');
+                if (!$('#custom-input-area').hasClass('hidden'))
+                    $('#custom-input').focus();
+            });
+
+            function get_source() {
+                return window.ace_source ? window.ace_source.getSession().getValue()
+                                         : $('#id_source').val();
+            }
+
+            function io_block($parent, label, content, truncated) {
+                if (content == null || content === '')
+                    return;
+                $parent.append($('<div class="test-run-io-label">')
+                    .text(label + (truncated ? TRUNCATED_SUFFIX : '')));
+                $parent.append($('<pre class="test-run-io">').text(content));
+            }
+
+            function render_case(c) {
+                var $case = $('<div class="test-run-case">');
+                var $head = $('<div class="test-run-case-head">');
+                $head.append($('<b>').text({{ _('Case')|htmltojs }} + ' #' + c.index));
+                if (c.status === 'SK') {
+                    $head.append($('<span>').text(' — ' + {{ _('skipped (time budget exceeded)')|htmltojs }}));
+                    return $case.append($head);
+                }
+                $head.append($('<span>').text(' — '));
+                $head.append($('<span class="test-run-status">').addClass(c.status).text(c.status));
+                if (c.time != null)
+                    $head.append($('<span class="test-run-time">').text(' — ' + c.time.toFixed(3) + 's'));
+                $case.append($head);
+                io_block($case, {{ _('Input')|htmltojs }}, c.input, c.truncated && c.truncated.input);
+                io_block($case, {{ _('Expected output')|htmltojs }}, c.expected, c.truncated && c.truncated.expected);
+                io_block($case, {{ _('Your output')|htmltojs }}, c.output, c.truncated && c.truncated.output);
+                io_block($case, {{ _('Error stream')|htmltojs }}, c.stderr, false);
+                return $case;
+            }
+
+            function run_tests(mode) {
+                var source = get_source();
+                if (!source.trim()) {
+                    alert({{ _('You must enter some source code first.')|htmltojs }});
+                    return;
+                }
+                if (source.length > 65536) {
+                    alert({{ _('Your source code must contain at most 65536 characters.')|htmltojs }});
+                    return;
+                }
+                $('#run-samples, #run-custom').prop('disabled', true);
+                $results.removeClass('hidden').empty()
+                    .append($('<i class="fa fa-spinner fa-pulse">'))
+                    .append($('<span>').text(' ' + {{ _('Running...')|htmltojs }}));
+                $.ajax({
+                    url: run_url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        source: source,
+                        language: parseInt($('#id_language').val()),
+                        mode: mode,
+                        custom_input: $('#custom-input').val()
+                    })
+                }).done(function (data) {
+                    $results.empty();
+                    var $head = $('<div class="test-run-head">');
+                    $head.append($('<span>').text({{ _('Result:')|htmltojs }} + ' '));
+                    $head.append($('<b class="test-run-status">').addClass(data.result).text(data.result));
+                    $head.append($('<span class="test-run-runtime">')
+                        .text(' (' + data.runtime.language + ' ' + data.runtime.version + ')'));
+                    $results.append($head);
+                    if (data.compile_error)
+                        io_block($results, {{ _('Compiler output')|htmltojs }}, data.compile_error, false);
+                    $.each(data.cases, function (i, c) {
+                        $results.append(render_case(c));
+                    });
+                }).fail(function (xhr) {
+                    $results.empty().append($('<div class="alert alert-warning">')
+                        .text(xhr.responseText || {{ _('The test runner is currently unavailable.')|htmltojs }}));
+                }).always(function () {
+                    update_run_buttons();
+                });
+            }
+
+            $('#run-samples').click(function () { run_tests('samples'); });
+            $('#run-custom').click(function () { run_tests('custom'); });
+        });
+    </script>
+    {% endif %}
 {% endcompress %}

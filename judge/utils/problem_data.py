@@ -106,6 +106,59 @@ def get_problem_testcases_data(problem):
     return testcases_data
 
 
+def get_full_case_contents(problem, cases, max_size):
+    """Return [{'input': str, 'output': str}] with the FULL contents of the given
+    ProblemTestCase rows, for the in-browser test runner. Unlike
+    get_problem_testcases_data, nothing is truncated, and problems whose test
+    files sit loose on disk (no 'archive' key in init.yml) are supported.
+
+    Raises ProblemDataError with a user-safe message on any failure.
+    """
+    from judge.models import problem_data_storage
+
+    init_path = '%s/init.yml' % problem.code
+    if not problem_data_storage.exists(init_path):
+        raise ProblemDataError(_('Problem data is not available.'))
+
+    try:
+        init_content = yaml.safe_load(problem_data_storage.open(init_path).read())
+    except yaml.YAMLError:
+        raise ProblemDataError(_('Problem data is not available.'))
+
+    archive = None
+    archive_path = (init_content or {}).get('archive', None)
+    if archive_path:
+        archive_path = '%s/%s' % (problem.code, archive_path)
+        if not problem_data_storage.exists(archive_path):
+            raise ProblemDataError(_('Problem data is not available.'))
+        try:
+            archive = zipfile.ZipFile(problem_data_storage.open(archive_path))
+        except zipfile.BadZipfile:
+            raise ProblemDataError(_('Problem data is not available.'))
+
+    def read_file(name):
+        try:
+            if archive is not None:
+                if archive.getinfo(name).file_size > max_size:
+                    raise ProblemDataError(_('A sample test case is too large to run in the browser.'))
+                data = archive.read(name)
+            else:
+                path = '%s/%s' % (problem.code, name)
+                if not problem_data_storage.exists(path):
+                    raise ProblemDataError(_('Problem data is not available.'))
+                if problem_data_storage.size(path) > max_size:
+                    raise ProblemDataError(_('A sample test case is too large to run in the browser.'))
+                with problem_data_storage.open(path) as f:
+                    data = f.read()
+        except ProblemDataError:
+            raise
+        except Exception:
+            raise ProblemDataError(_('Problem data is not available.'))
+        return data.decode('utf-8', errors='ignore')
+
+    return [{'input': read_file(case.input_file), 'output': read_file(case.output_file)} for case in cases]
+
+
 class ProblemDataCompiler(object):
     def __init__(self, problem, data, cases, files):
         self.problem = problem

@@ -238,6 +238,34 @@ Lưu ý khi chạy nhiều judge:
 - Contest xong có thể tắt bớt judge thuê thêm (`systemctl stop dmoj-judge` rồi hủy VPS) —
   site không cần đụng gì, bản ghi judge trong admin để đó dùng lại lần sau.
 
+## 6b. Piston — sandbox cho nút "Chạy thử sample" (tùy chọn)
+
+Tính năng chạy thử sample/custom input trên trang đề cần một container Piston
+chạy cạnh site (thiết kế chi tiết: `dev-plans/run-sample-tests.md`):
+
+```bash
+docker run -d --name piston --restart unless-stopped --privileged \
+    -p 127.0.0.1:2000:2000 \
+    -v $HOME/piston/packages:/piston/packages \
+    -e PISTON_OUTPUT_MAX_SIZE=1048576 \
+    ghcr.io/engineer-man/piston
+
+# cài runtime (xem version có sẵn: GET /api/v2/packages)
+for pkg in '{"language":"gcc","version":"10.2.0"}' '{"language":"python","version":"3.12.0"}' \
+           '{"language":"python","version":"2.7.18"}' '{"language":"java","version":"15.0.2"}' \
+           '{"language":"kotlin","version":"1.8.20"}' '{"language":"pascal","version":"3.2.2"}'; do
+  curl -X POST http://localhost:2000/api/v2/packages -H 'Content-Type: application/json' -d "$pkg"
+done
+```
+
+Rồi đặt trong cấu hình site: `VNOJ_PISTON_URL = 'http://localhost:2000'`.
+Site chạy trong Docker compose thì trỏ qua gateway của bridge network
+(vd `http://172.17.0.1:2000`) và bind Piston vào IP đó thay vì 127.0.0.1.
+Không đặt biến này thì tính năng tự tắt, site hoạt động bình thường.
+
+**Lưu ý bảo mật**: chỉ bind Piston vào interface nội bộ, tuyệt đối không mở
+port 2000 ra Internet — đó là một endpoint thực thi code tùy ý.
+
 ## 7. Backup (cron hằng ngày trên VPS site)
 
 ```bash

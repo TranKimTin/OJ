@@ -36,6 +36,7 @@ from judge.utils.codeforces_polygon import ImportPolygonError, PolygonImporter
 from judge.utils.infinite_paginator import InfinitePaginationMixin
 from judge.utils.opengraph import generate_opengraph
 from judge.utils.pdfoid import PDF_RENDERING_ENABLED, render_pdf
+from judge.utils.piston import PISTON_ENABLED
 from judge.utils.problems import hot_problems, user_attempted_ids, \
     user_completed_ids
 from judge.utils.strings import safe_float_or_none, safe_int_or_none
@@ -268,6 +269,11 @@ class ProblemSubmitMixin:
             'submissions_left': self.remaining_submission_count,
             'ACE_URL': settings.ACE_URL,
             'default_lang': self.default_language,
+            'piston_enabled': PISTON_ENABLED,
+            'piston_langs': json.dumps(sorted(settings.VNOJ_PISTON_LANGUAGE_MAP.keys())),
+            'has_sample_cases': PISTON_ENABLED and
+                self.object.cases.filter(is_sample=True, type='C').exclude(input_file='').exists(),
+            'run_url': reverse('problem_run_ajax', args=[self.object.code]) if PISTON_ENABLED else None,
         }
 
     def handle_submission_post(self, request):

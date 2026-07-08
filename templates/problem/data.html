@@ -1041,6 +1041,7 @@
                 <th>{{ _('Input file') }}</th>
                 <th>{{ _('Output file') }}</th>
                 <th>{{ _('Points') }}</th>
+                <th>{{ _('Sample?') }}</th>
                 {% if request.user.is_staff %}
                 <th>{{ _('Pretest?') }}</th>
                 {% endif %}
@@ -1057,7 +1058,7 @@
             {% for form in all_case_forms %}
                 {% if form.non_field_errors() %}
                     <tr>
-                        <td colspan="{{ 9 + cases_formset.can_delete }}">{{ form.non_field_errors() }}</td>
+                        <td colspan="{{ 10 + cases_formset.can_delete }}">{{ form.non_field_errors() }}</td>
                     </tr>
                 {% endif %}
                 {% if form.prefix and '__prefix__' in form.prefix %}
@@ -1077,6 +1078,7 @@
                         {{ form.output_file.errors }}{{ form.output_file }}
                     </td>
                     <td>{{ form.points.errors }}{{ form.points }}{% if not request.user.is_staff %}{{ form.is_pretest.as_hidden() }}{% endif %}</td>
+                    <td>{{ form.is_sample.errors }}{{ form.is_sample }}</td>
                     {% if request.user.is_staff %}
                         <td>{{ form.is_pretest.errors }}{{ form.is_pretest }}</td>
                     {% endif %}
